@@ -56,8 +56,19 @@ body {
     margin-top: 10px;
   }
   
-  #status {
-    font-weight: bold;
+  .status-green {
+    background: #d4edda;
+    color: #155724;
+  }
+  
+  .status-orange {
+    background: #fff3cd;
+    color: #856404;
+  }
+  
+  .status-red {
+    background: #f8d7da;
+    color: #721c24;
   }
   
   /* WhatsApp Icon */
