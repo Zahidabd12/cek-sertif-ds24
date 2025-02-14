@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Pengecekan Sertifikat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Login Page -->
+  <div id="login-page" class="container">
+    <div class="card">
+      <h1>Login</h1>
+      <form id="login-form">
+        <label for="nim">NIM:</label>
+        <input type="text" id="nim" name="nim" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+      <p id="error-message" class="error"></p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="container hidden">
+    <div class="card">
+      <h1 id="welcome-message"></h1>
+      <div id="user-info">
+        <p><strong>NIM:</strong> <span id="user-nim"></span></p>
+        <p><strong>Kelas:</strong> DS-04-<span id="user-kelas"></span></p>
+        <p><strong>Sertifikat Disetujui:</strong> <span id="sertif-disetujui"></span></p>
+        <p><strong>Sisa Sertifikat:</strong> <span id="sisa-sertif"></span></p>
+        <p><strong>Status:</strong> <span id="status"></span></p>
+        <p><strong>Deadline:</strong> <span id="deadline"></span></p>
+      </div>
+      <button id="collect-cert-btn" class="btn-primary">Kumpulkan Sertifikat</button>
+    </div>
+  </div>
+
+  <!-- WhatsApp Icon -->
+  <a href="https://wa.me/1234567890" target="_blank" id="whatsapp-icon" class="hidden">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="40">
+  </a>
+
+  <script src="script.js"></script>
+</body>
+</html>
