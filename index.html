@@ -23,18 +23,59 @@
   </div>
 
   <!-- Dashboard -->
-  <div id="dashboard" class="container hidden">
+  <div id="dashboard" class="hidden">
     <div class="card">
       <h1 id="welcome-message"></h1>
       <div id="user-info">
         <p><strong>NIM:</strong> <span id="user-nim"></span></p>
-        <p><strong>Kelas:</strong> DS-04-<span id="user-kelas"></span></p>
+        <p><strong>Kelas:</strong> <span id="user-kelas"></span></p>
         <p><strong>Sertifikat Disetujui:</strong> <span id="sertif-disetujui"></span></p>
         <p><strong>Sisa Sertifikat:</strong> <span id="sisa-sertif"></span></p>
         <p><strong>Status:</strong> <span id="status"></span></p>
         <p><strong>Deadline:</strong> <span id="deadline"></span></p>
       </div>
+      <p>Hubungi Helpdesk: <a href="#" id="helpdesk-link" class="btn-secondary">WhatsApp</a></p>
       <button id="collect-cert-btn" class="btn-primary">Kumpulkan Sertifikat</button>
+    </div>
+  </div>
+
+  <!-- Certificate Submission Form -->
+  <div id="cert-submission-form" class="hidden">
+    <div class="card">
+      <h1>Submit Sertifikat</h1>
+      <form id="cert-form">
+        <label for="class-select">Pilih Kelas:</label>
+        <select id="class-select" required>
+          <option value="">Pilih Kelas</option>
+          <option value="01">01</option>
+          <option value="02">02</option>
+        </select>
+
+        <label for="name-select">Nama:</label>
+        <select id="name-select" required>
+          <option value="">Pilih Nama</option>
+        </select>
+
+        <label for="nim-input">NIM:</label>
+        <input type="text" id="nim-input" name="nim" readonly>
+
+        <label for="category">Kategori Lomba:</label>
+        <select id="category" required>
+          <option value="">Pilih Kategori</option>
+          <option value="akademik">Akademik</option>
+          <option value="non-akademik">Non-Akademik</option>
+        </select>
+
+        <label for="description">Deskripsi Lomba:</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="certificate-link">Link Sertifikat:</label>
+        <input type="url" id="certificate-link" name="certificate-link" placeholder="https://drive.google.com/file/d/..." required>
+
+        <button type="submit" class="btn-primary">Submit</button>
+      </form>
+      <p id="submission-error" class="error"></p>
+      <button id="back-btn" class="btn-secondary">Kembali ke Dashboard</button>
     </div>
   </div>
 
