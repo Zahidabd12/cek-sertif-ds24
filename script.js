@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle collect certificate button click
     collectCertBtn.addEventListener("click", () => {
       const nim = userNim.textContent;
-      const url = `https://example.com/certificate?nim=${nim}`;
+      const url = `https://forms.gle/xCeXBMgMssiJvSra9`;
       window.open(url, '_blank');
     });
   });
