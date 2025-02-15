@@ -1,25 +1,41 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // DOM Elements
-  const loginPage = document.getElementById("login-page");
-  const dashboard = document.getElementById("dashboard");
-  const errorMessage = document.getElementById("error-message");
-  const userNim = document.getElementById("user-nim");
-  const userKelas = document.getElementById("user-kelas");
-  const sertifDisetujui = document.getElementById("sertif-disetujui");
-  const sisaSertif = document.getElementById("sisa-sertif");
-  const status = document.getElementById("status");
-  const deadlineElement = document.getElementById("deadline");
-  const welcomeMessage = document.getElementById("welcome-message");
-  const whatsappIcon = document.getElementById("whatsapp-icon");
-  const collectCertBtn = document.getElementById("collect-cert-btn");
-  const certSubmissionForm = document.getElementById("cert-submission-form");
-  const submissionError = document.getElementById("submission-error");
-  const backBtn = document.getElementById("back-btn");
-  const loginForm = document.getElementById("login-form");
-  const loadingOverlay = document.getElementById("loading-overlay");
-  const notification = document.getElementById('notification');
-  const notificationMessage = notification.querySelector('.notification-message');
-  const notificationClose = notification.querySelector('.notification-close');
+  // Debug function
+  function debugLog(message, ...args) {
+    console.log(`[Certificate System] ${message}`, ...args);
+  }
+
+  // DOM Elements - Robust Selection
+  const elements = {
+    loginPage: document.getElementById("login-page"),
+    dashboard: document.getElementById("dashboard"),
+    errorMessage: document.getElementById("error-message"),
+    userNim: document.getElementById("user-nim"),
+    userKelas: document.getElementById("user-kelas"),
+    sertifDisetujui: document.getElementById("sertif-disetujui"),
+    sisaSertif: document.getElementById("sisa-sertif"),
+    status: document.getElementById("status"),
+    deadlineElement: document.getElementById("deadline"),
+    welcomeMessage: document.getElementById("welcome-message"),
+    whatsappIcon: document.getElementById("whatsapp-icon"),
+    collectCertBtn: document.getElementById("collect-cert-btn"),
+    certSubmissionForm: document.getElementById("cert-submission-form"),
+    submissionError: document.getElementById("submission-error"),
+    backBtn: document.getElementById("back-btn"),
+    loginForm: document.getElementById("login-form"),
+    loadingOverlay: document.getElementById("loading-overlay"),
+    notification: document.getElementById('notification')
+  };
+
+  // Validate DOM elements
+  Object.entries(elements).forEach(([key, value]) => {
+    if (!value) {
+      console.warn(`Element not found: ${key}`);
+    }
+  });
+
+  // Additional notification elements
+  const notificationMessage = elements.notification?.querySelector('.notification-message');
+  const notificationClose = elements.notification?.querySelector('.notification-close');
 
   // State
   let currentUser = null;
@@ -27,20 +43,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Notification Functions
   function showNotification(message, type = 'success') {
+    if (!notificationMessage || !elements.notification) return;
+
     notificationMessage.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.classList.add('show');
+    elements.notification.className = `notification ${type}`;
+    elements.notification.classList.add('show');
     
-    setTimeout(() => {
-      hideNotification();
-    }, 5000);
+    setTimeout(hideNotification, 5000);
   }
 
   function hideNotification() {
-    notification.classList.remove('show');
+    elements.notification?.classList.remove('show');
   }
 
-  notificationClose.addEventListener('click', hideNotification);
+  notificationClose?.addEventListener('click', hideNotification);
 
   // Deadline Calculation
   function calculateDeadlineDays() {
@@ -52,6 +68,69 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const timeDifference = deadline.getTime() - today.getTime();
     return Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+  }
+
+  // Setup Collect Certificate Button
+  function setupCollectCertButton() {
+    debugLog('Setting up Collect Certificate Button');
+
+    if (!elements.collectCertBtn) {
+      console.error('Collect Certificate Button not found!');
+      return;
+    }
+
+    elements.collectCertBtn.addEventListener('click', (event) => {
+      event.preventDefault(); // Prevent any default button behavior
+      
+      debugLog('Collect Certificate Button Clicked');
+
+      // Ensure a user is logged in
+      if (!currentUser) {
+        showNotification('Silakan login terlebih dahulu', 'error');
+        return;
+      }
+
+      // Populate form with user data
+      const formElements = {
+        nim: document.getElementById("form-nim"),
+        nama: document.getElementById("form-nama"),
+        kelas: document.getElementById("form-kelas"),
+        nimDisplay: document.getElementById("form-nim-display"),
+        namaDisplay: document.getElementById("form-nama-display"),
+        kelasDisplay: document.getElementById("form-kelas-display")
+      };
+
+      // Validate form elements
+      const missingElements = Object.entries(formElements)
+        .filter(([, element]) => !element)
+        .map(([key]) => key);
+
+      if (missingElements.length > 0) {
+        console.error(`Missing form elements: ${missingElements.join(', ')}`);
+        showNotification('Terjadi kesalahan dalam form', 'error');
+        return;
+      }
+
+      // Populate form
+      formElements.nim.value = currentUser.nim;
+      formElements.nama.value = currentUser.nama;
+      formElements.kelas.value = currentUser.kelas;
+      
+      formElements.nimDisplay.textContent = currentUser.nim;
+      formElements.namaDisplay.textContent = currentUser.nama;
+      formElements.kelasDisplay.textContent = currentUser.kelas;
+
+      // Toggle visibility
+      if (elements.dashboard && elements.certSubmissionForm) {
+        elements.dashboard.classList.add("hidden");
+        elements.certSubmissionForm.classList.remove("hidden");
+        debugLog('Switched to Certificate Submission Form');
+      } else {
+        console.error('Dashboard or Submission Form elements missing');
+      }
+    });
+
+    debugLog('Collect Certificate Button Setup Complete');
   }
 
   // Load User Data
@@ -70,8 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
           nama: row.c[1] ? row.c[1].v : null,
           kelas: row.c[2] ? row.c[2].v : null,
           sertif_disetujui: row.c[3] ? parseInt(row.c[3].v) : 0,
-          deadline: new Date(2025, 5, 14) // Fixed deadline for all users
+          deadline: new Date(2025, 5, 14)
         }));
+
+        // Setup button after data is loaded
+        setupCollectCertButton();
       } catch (error) {
         console.error("Error parsing data:", error);
         showNotification("Gagal memuat data. Refresh halaman.", "error");
@@ -84,86 +166,85 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Update Dashboard
   function updateDashboard(user) {
-    userNim.textContent = user.nim;
-    userKelas.textContent = user.kelas;
-    sertifDisetujui.textContent = user.sertif_disetujui;
+    if (!user) return;
+
+    elements.userNim.textContent = user.nim;
+    elements.userKelas.textContent = user.kelas;
+    elements.sertifDisetujui.textContent = user.sertif_disetujui;
     
     const remaining = 10 - user.sertif_disetujui;
-    sisaSertif.textContent = remaining;
-    welcomeMessage.textContent = `Selamat datang, ${user.nama}!`;
+    elements.sisaSertif.textContent = remaining;
+    elements.welcomeMessage.textContent = `Selamat datang, ${user.nama}!`;
 
     const daysRemaining = calculateDeadlineDays();
     if (daysRemaining > 0) {
-      deadlineElement.textContent = `Tersisa ${daysRemaining} hari lagi untuk pengumpulan!`;
+      elements.deadlineElement.textContent = `Tersisa ${daysRemaining} hari lagi untuk pengumpulan!`;
     } else if (daysRemaining === 0) {
-      deadlineElement.textContent = "Hari ini adalah deadline pengumpulan!";
+      elements.deadlineElement.textContent = "Hari ini adalah deadline pengumpulan!";
     } else {
-      deadlineElement.textContent = "Deadline telah terlewati!";
+      elements.deadlineElement.textContent = "Deadline telah terlewati!";
     }
 
     if (remaining === 0) {
-      status.textContent = "Semua sertifikat telah dikumpulkan!";
-      status.className = "status-green";
+      elements.status.textContent = "Semua sertifikat telah dikumpulkan!";
+      elements.status.className = "status-green";
     } else if (remaining <= 5) {
-      status.textContent = "Hampir selesai! Tetap semangat!";
-      status.className = "status-orange";
+      elements.status.textContent = "Hampir selesai! Tetap semangat!";
+      elements.status.className = "status-orange";
     } else {
-      status.textContent = "Masih banyak sertifikat yang harus dikumpulkan!";
-      status.className = "status-red";
+      elements.status.textContent = "Masih banyak sertifikat yang harus dikumpulkan!";
+      elements.status.className = "status-red";
     }
   }
 
-  // Event Handlers
-  loginForm.addEventListener("submit", (event) => {
+  // Login Handler
+  elements.loginForm?.addEventListener("submit", (event) => {
     event.preventDefault();
-    const nim = document.getElementById("nim").value;
-    const password = document.getElementById("password").value;
+    const nimInput = document.getElementById("nim");
+    const passwordInput = document.getElementById("password");
+
+    if (!nimInput || !passwordInput) {
+      showNotification("Terjadi kesalahan pada form login", "error");
+      return;
+    }
+
+    const nim = nimInput.value;
+    const password = passwordInput.value;
 
     const user = userData.find((u) => u.nim === parseFloat(nim));
 
     if (user && password === `${nim}${user.kelas}`) {
       currentUser = user;
-      loginPage.classList.add("hidden");
-      dashboard.classList.remove("hidden");
-      whatsappIcon.classList.remove("hidden");
+      elements.loginPage.classList.add("hidden");
+      elements.dashboard.classList.remove("hidden");
+      elements.whatsappIcon.classList.remove("hidden");
       updateDashboard(user);
       showNotification("Login berhasil! 👋", "success");
-    } else {
-      errorMessage.textContent = "NIM atau Password salah!";
-      showNotification("Login gagal! Periksa NIM dan Password.", "error");
-    }
+      
+      // Add this line to show maintenance overlay
+      maintenanceOverlay.classList.remove("hidden");
+  }
   });
 
-  collectCertBtn.addEventListener("click", () => {
-    document.getElementById("form-nim").value = currentUser.nim;
-    document.getElementById("form-nama").value = currentUser.nama;
-    document.getElementById("form-kelas").value = currentUser.kelas;
-    
-    document.getElementById("form-nim-display").textContent = currentUser.nim;
-    document.getElementById("form-nama-display").textContent = currentUser.nama;
-    document.getElementById("form-kelas-display").textContent = currentUser.kelas;
-
-    certSubmissionForm.classList.remove("hidden");
-    dashboard.classList.add("hidden");
-  });
-
-  backBtn.addEventListener("click", () => {
-    certSubmissionForm.classList.add("hidden");
-    dashboard.classList.remove("hidden");
+  // Back Button Handler
+  elements.backBtn?.addEventListener("click", () => {
+    elements.certSubmissionForm.classList.add("hidden");
+    elements.dashboard.classList.remove("hidden");
     document.getElementById("cert-form").reset();
   });
 
+  // Certificate Submission Handler
   const certForm = document.getElementById("cert-form");
-  certForm.addEventListener("submit", async (event) => {
+  certForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    submissionError.textContent = "";
+    elements.submissionError.textContent = "";
 
     const category = document.getElementById("category").value;
     const description = document.getElementById("description").value;
     const certificateLink = document.getElementById("certificate-link").value;
 
     if (!category || !description || !certificateLink) {
-      submissionError.textContent = "Mohon isi semua field dengan benar!";
+      elements.submissionError.textContent = "Mohon isi semua field dengan benar!";
       showNotification("Mohon lengkapi semua field!", "error");
       return;
     }
@@ -177,10 +258,10 @@ document.addEventListener("DOMContentLoaded", () => {
       link_sertifikat: certificateLink
     };
 
-    const url = "https://script.google.com/macros/s/AKfycbwniJv72T5P9jH8swvSlzvmbGaSiGa3pMDbLB2YFUvaNwSg5hG0B9J6WHAdp1Rbn7EJ5A/exec";
+    const url = "https://script.google.com/macros/s/AKfycbwoW_g_U4dwuLjXOYyWaXmVtOhf3oy0sCU0owHQwQ9QtDW6G8uCSF2LeQVWxpSTfpPuLA/exec";
 
     try {
-      loadingOverlay.classList.add("show");
+      elements.loadingOverlay.classList.add("show");
       certForm.classList.add("submitting");
 
       const queryString = new URLSearchParams(data).toString();
@@ -202,16 +283,48 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("form-nama").value = currentUser.nama;
       document.getElementById("form-kelas").value = currentUser.kelas;
       
-      certSubmissionForm.classList.add("hidden");
-      dashboard.classList.remove("hidden");
+      elements.certSubmissionForm.classList.add("hidden");
+      elements.dashboard.classList.remove("hidden");
       
     } catch (error) {
       console.error("Error submitting data:", error);
       showNotification("Gagal mengirim sertifikat. Coba lagi.", "error");
-      submissionError.textContent = "Terjadi kesalahan. Silakan coba lagi.";
+      elements.submissionError.textContent = "Terjadi kesalahan. Silakan coba lagi.";
     } finally {
-      loadingOverlay.classList.remove("show");
+      elements.loadingOverlay.classList.remove("show");
       certForm.classList.remove("submitting");
     }
   });
+
+  // Initial setup
+  debugLog('Script initialization complete');
+  // At the top of your DOMContentLoaded event listener
+const maintenanceOverlay = document.getElementById('maintenance-overlay');
+
+// Add this function
+function handleMaintenanceLogout() {
+    // Reset all states
+    elements.loginPage.classList.remove("hidden");
+    elements.dashboard.classList.add("hidden");
+    elements.certSubmissionForm.classList.add("hidden");
+    elements.whatsappIcon.classList.add("hidden");
+    maintenanceOverlay.classList.add("hidden");
+    
+    // Reset forms
+    elements.loginForm.reset();
+    if (document.getElementById("cert-form")) {
+        document.getElementById("cert-form").reset();
+    }
+    
+    // Clear error messages
+    elements.errorMessage.textContent = "";
+    showNotification("Anda telah keluar dari sistem", "success");
+    
+    // Reset current user
+    currentUser = null;
+}
+
+// Modify the login handler in your script.js
+// Find this part in your login form event listener:
+
 });
