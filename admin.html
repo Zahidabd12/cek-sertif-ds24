@@ -1,0 +1,69 @@
+<!-- Add this as a new file: admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sistem Pengecekan Sertifikat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Admin Login Page -->
+    <div id="admin-login-page" class="container">
+        <div class="card">
+            <h1>Admin Login</h1>
+            <form id="admin-login-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                
+                <label for="admin-password">Password:</label>
+                <input type="password" id="admin-password" name="password" required>
+                
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            <p id="admin-error-message" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden">
+        <div class="card">
+            <h1>Dashboard Admin</h1>
+            <div class="admin-header">
+                <h2>Daftar Pengajuan Sertifikat</h2>
+                <button id="refresh-btn" class="btn-secondary">
+                    <span class="refresh-icon">↻</span> Refresh Data
+                </button>
+            </div>
+            
+            <div class="submissions-container">
+                <div class="submissions-header">
+                    <p><strong>Total Pengajuan:</strong> <span id="total-submissions">0</span></p>
+                    <p><strong>Menunggu Persetujuan:</strong> <span id="pending-submissions">0</span></p>
+                </div>
+                
+                <div id="submissions-list">
+                    <!-- Submissions will be loaded here -->
+                </div>
+            </div>
+
+            <button id="admin-logout-btn" class="btn-secondary">Logout</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Memproses...</div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span class="notification-icon">✓</span>
+        <span class="notification-message"></span>
+        <span class="notification-close">&times;</span>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
