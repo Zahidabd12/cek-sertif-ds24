@@ -1,4 +1,3 @@
-<!-- Add this as a new file: admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +11,7 @@
     <div id="admin-login-page" class="container">
         <div class="card">
             <h1>Admin Login</h1>
-            <form id="admin-login-form">
+            <form id="admin-login-form" autocomplete="on">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
                 
@@ -25,15 +24,20 @@
         </div>
     </div>
 
-    <!-- Admin Dashboard -->
+    <!-- Admin Dashboard for Pending Submissions -->
     <div id="admin-dashboard" class="hidden">
         <div class="card">
             <h1>Dashboard Admin</h1>
             <div class="admin-header">
                 <h2>Daftar Pengajuan Sertifikat</h2>
-                <button id="refresh-btn" class="btn-secondary">
-                    <span class="refresh-icon">↻</span> Refresh Data
-                </button>
+                <div class="nav-buttons">
+                    <button id="view-approved-btn" class="btn-secondary">
+                        Lihat Sertifikat Disetujui
+                    </button>
+                    <button id="refresh-btn" class="btn-secondary">
+                        <span class="refresh-icon">↻</span> Refresh Data
+                    </button>
+                </div>
             </div>
             
             <div class="submissions-container">
@@ -51,6 +55,65 @@
         </div>
     </div>
 
+    <!-- Approved Certificates Dashboard -->
+    <div id="approved-dashboard" class="hidden">
+        <div class="card">
+            <div class="nav-header">
+                <h1>Sertifikat Disetujui</h1>
+                <div class="nav-buttons">
+                    <button id="view-pending-btn" class="btn-secondary">
+                        Lihat Pengajuan
+                    </button>
+                    <button id="refresh-approved-btn" class="btn-secondary">
+                        <span class="refresh-icon">↻</span> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rankings Section -->
+            <div class="rankings-section">
+                <h2>Peringkat Pengumpulan Sertifikat</h2>
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <h3>Total Sertifikat Disetujui</h3>
+                        <p id="total-approved">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Mahasiswa Aktif</h3>
+                        <p id="active-students">0</p>
+                    </div>
+                </div>
+                <div id="rankings-list" class="rankings-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Peringkat</th>
+                                <th>NIM</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Jumlah Sertifikat</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankings-body">
+                            <!-- Rankings will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Approved Certificates List -->
+            <div class="approved-section">
+                <h2>Daftar Sertifikat Disetujui</h2>
+                <div id="approved-list">
+                    <!-- Approved certificates will be loaded here -->
+                </div>
+            </div>
+
+            <button id="admin-approved-logout-btn" class="btn-secondary">Logout</button>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
@@ -61,7 +124,7 @@
     <div id="notification" class="notification">
         <span class="notification-icon">✓</span>
         <span class="notification-message"></span>
-        <span class="notification-close">&times;</span>
+        <button type="button" class="notification-close" aria-label="Close">&times;</button>
     </div>
 
     <script src="admin.js"></script>
