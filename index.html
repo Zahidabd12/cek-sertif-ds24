@@ -1,89 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Pengecekan Sertifikat</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengecekan Sertifikat</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Login Page -->
-  <div id="login-page" class="container">
-    <div class="card">
-      <h1>Login</h1>
-      <form id="login-form">
-        <label for="nim">NIM:</label>
-        <input type="text" id="nim" name="nim" required>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit" class="btn-primary">Login</button>
-      </form>
-      <p id="error-message" class="error"></p>
+    <!-- Login Page -->
+    <div id="login-page" class="container">
+        <div class="card">
+            <h1>Login</h1>
+            <form id="login-form" autocomplete="on">
+                <label for="nim">NIM:</label>
+                <input type="text" 
+                       id="nim" 
+                       name="nim" 
+                       autocomplete="username"
+                       inputmode="numeric"
+                       required>
+                
+                <label for="password">Password:</label>
+                <input type="password" 
+                       id="password" 
+                       name="password" 
+                       autocomplete="current-password"
+                       required>
+                
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            <p id="error-message" class="error"></p>
+        </div>
     </div>
-  </div>
 
-  <!-- Dashboard -->
-  <div id="dashboard" class="hidden">
-    <div class="card">
-      <h1 id="welcome-message"></h1>
-      <div id="user-info">
-        <p><strong>NIM:</strong> <span id="user-nim"></span></p>
-        <p><strong>Kelas:</strong> <span id="user-kelas"></span></p>
-        <p><strong>Sertifikat Disetujui:</strong> <span id="sertif-disetujui"></span></p>
-        <p><strong>Sisa Sertifikat:</strong> <span id="sisa-sertif"></span></p>
-        <p><strong>Status:</strong> <span id="status"></span></p>
-        <p><strong>Deadline:</strong> <span id="deadline"></span></p>
-      </div>
-      <p>Hubungi Helpdesk: <a href="#" id="helpdesk-link" class="btn-secondary">WhatsApp</a></p>
-      <button id="collect-cert-btn" class="btn-primary">Kumpulkan Sertifikat</button>
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+        <div class="card">
+            <h1 id="welcome-message"></h1>
+            
+            <!-- User Information -->
+            <div id="user-info">
+                <p><strong>NIM:</strong> <span id="user-nim"></span></p>
+                <p><strong>Kelas:</strong> <span id="user-kelas"></span></p>
+                <p><strong>Sertifikat Disetujui:</strong> <span id="sertif-disetujui"></span></p>
+                <p><strong>Sisa Sertifikat:</strong> <span id="sisa-sertif"></span></p>
+                <p><strong>Status:</strong> <span id="status"></span></p>
+                <p><strong>Deadline:</strong> <span id="deadline"></span></p>
+            </div>
+
+            <!-- Actions -->
+            <p>Hubungi Helpdesk: 
+                <a href="https://wa.me/6285869678984" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   id="helpdesk-link" 
+                   class="btn-secondary">WhatsApp</a>
+            </p>
+            <button id="collect-cert-btn" class="btn-primary">Kumpulkan Sertifikat</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Certificate Submission Form -->
-  <div id="cert-submission-form" class="hidden">
-    <div class="card">
-      <h1>Submit Sertifikat</h1>
-      <form id="cert-form">
-        <label for="class-select">Pilih Kelas:</label>
-        <select id="class-select" required>
-          <option value="">Pilih Kelas</option>
-          <option value="01">01</option>
-          <option value="02">02</option>
-        </select>
+    <!-- Certificate Submission Form -->
+    <div id="cert-submission-form" class="hidden">
+        <div class="card">
+            <h1>Submit Sertifikat</h1>
+            
+            <form id="cert-form" autocomplete="off">
+                <!-- User Info Display -->
+                <div class="user-info-display">
+                    <p><strong>NIM:</strong> <span id="form-nim-display"></span></p>
+                    <p><strong>Nama:</strong> <span id="form-nama-display"></span></p>
+                    <p><strong>Kelas:</strong> <span id="form-kelas-display"></span></p>
+                </div>
 
-        <label for="name-select">Nama:</label>
-        <select id="name-select" required>
-          <option value="">Pilih Nama</option>
-        </select>
+                <!-- Hidden User Data -->
+                <input type="hidden" id="form-nim" name="nim">
+                <input type="hidden" id="form-nama" name="nama">
+                <input type="hidden" id="form-kelas" name="kelas">
 
-        <label for="nim-input">NIM:</label>
-        <input type="text" id="nim-input" name="nim" readonly>
+                <!-- Form Fields -->
+                <label for="category">Kategori Lomba:</label>
+                <select id="category" 
+                        name="kategori_lomba"
+                        required>
+                    <option value="">Pilih Kategori</option>
+                    <option value="akademik">Akademik</option>
+                    <option value="non-akademik">Non-Akademik</option>
+                </select>
 
-        <label for="category">Kategori Lomba:</label>
-        <select id="category" required>
-          <option value="">Pilih Kategori</option>
-          <option value="akademik">Akademik</option>
-          <option value="non-akademik">Non-Akademik</option>
-        </select>
+                <label for="description">Deskripsi Lomba:</label>
+                <textarea id="description" 
+                          name="deskripsi_lomba" 
+                          rows="4"
+                          placeholder="Masukkan deskripsi lomba..."
+                          required></textarea>
 
-        <label for="description">Deskripsi Lomba:</label>
-        <textarea id="description" name="description" required></textarea>
+                <label for="certificate-link">Link Sertifikat:</label>
+                <input type="url" 
+                       id="certificate-link" 
+                       name="link_sertifikat" 
+                       placeholder="https://drive.google.com/file/d/..." 
+                       pattern="https://.*"
+                       required>
 
-        <label for="certificate-link">Link Sertifikat:</label>
-        <input type="url" id="certificate-link" name="certificate-link" placeholder="https://drive.google.com/file/d/..." required>
+                <button type="submit" class="btn-primary">Submit</button>
+            </form>
 
-        <button type="submit" class="btn-primary">Submit</button>
-      </form>
-      <p id="submission-error" class="error"></p>
-      <button id="back-btn" class="btn-secondary">Kembali ke Dashboard</button>
+            <p id="submission-error" class="error"></p>
+            <button id="back-btn" class="btn-secondary">Kembali ke Dashboard</button>
+        </div>
     </div>
-  </div>
 
-  <!-- WhatsApp Icon -->
-  <a href="https://wa.me/6285869678984" target="_blank" id="whatsapp-icon" class="hidden">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="40">
-  </a>
+    <!-- Fixed Components -->
+    <a href="https://wa.me/6285869678984" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       id="whatsapp-icon" 
+       class="hidden"
+       aria-label="Contact via WhatsApp">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+             alt="WhatsApp" 
+             width="40"
+             height="40">
+    </a>
 
-  <script src="script.js"></script>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" aria-hidden="true">
+        <div class="loading-spinner" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div class="loading-text">Sedang mengirim sertifikat...</div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" role="alert" aria-live="polite">
+        <span class="notification-icon" aria-hidden="true">✓</span>
+        <span class="notification-message"></span>
+        <button type="button" class="notification-close" aria-label="Close notification">&times;</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
 </body>
 </html>
