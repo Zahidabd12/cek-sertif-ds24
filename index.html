@@ -1,263 +1,287 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pengecekan Sertifikat</title>
-    
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Halaman Login -->
-    <main class="container">
-        <section id="login-page">
-            <div class="card">
-                <h1>Login Sistem Sertifikat</h1>
-                
-                <form id="login-form" autocomplete="on">
-                    <div class="form-group">
-                        <label for="nim">NIM:</label>
-                        <input 
-                            type="text" 
-                            id="nim" 
-                            name="nim" 
-                            autocomplete="username"
-                            inputmode="numeric"
-                            required
-                            placeholder="Masukkan NIM Anda"
-                        >
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sistem Pengecekan Sertifikat</title>
+        
+        <!-- Stylesheet -->
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <!-- Halaman Login -->
+        <main class="container">
+            <section id="feedback-section" class="hidden">
+                <div class="card">
+                    <header>
+                        <h1>Feedback Sertifikat</h1>
+                    </header>
+                    
+                    <div id="feedback-list">
+                        <!-- Feedback items will be dynamically populated here -->
+                        <p id="no-feedback-message" class="text-center">Belum ada feedback untuk sertifikat Anda.</p>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="password">Password:</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            autocomplete="current-password"
-                            required
-                            placeholder="Masukkan Password"
-                        >
+                    <footer>
+                        <button id="back-to-dashboard-feedback" class="btn-secondary">
+                            Kembali ke Dashboard
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <section id="approved-certificates-section" class="hidden">
+                <div class="card">
+                    <header>
+                        <h1>Sertifikat Disetujui</h1>
+                    </header>
+                    
+                    <div id="approved-certificates-list">
+                        <!-- Approved certificates will be dynamic  ally populated here -->
+                        <p id="no-approved-certificates-message" class="text-center">Belum ada sertifikat yang disetujui.</p>
                     </div>
                     
-                    <button type="submit" class="btn-primary">Masuk</button>
-                </form>
-                
-                <p id="error-message" class="error"></p>
-            </div>
-        </section>
+                    <footer>
+                        <button id="back-to-dashboard-approved" class="btn-secondary">
+                            Kembali ke Dashboard
+                        </button>
+                    </footer>
+                </div>
+            </section>
+            <section id="login-page">
+                <div class="card">
+                    <h1>Login Sistem Sertifikat</h1>
+                    
+                    <form id="login-form" autocomplete="on">
+                        <div class="form-group">
+                            <label for="nim">NIM:</label>
+                            <input 
+                                type="text" 
+                                id="nim" 
+                                name="nim" 
+                                autocomplete="username"
+                                inputmode="numeric"
+                                required
+                                placeholder="Masukkan NIM Anda"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                autocomplete="current-password"
+                                required
+                                placeholder="Masukkan Password"
+                            >
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Masuk</button>
+                    </form>
+                    
+                    <p id="error-message" class="error"></p>
+                </div>
+            </section>
 
-        <!-- Dashboard Pengguna -->
-        <section id="dashboard" class="hidden">
-            <div class="card">
-                <header>
-                    <h1 id="welcome-message">Selamat Datang</h1>
-                </header>
-                
-                <section id="user-info">
-                    <div class="info-row">
-                        <strong>NIM:</strong>
-                        <span id="user-nim"></span>
+            <!-- Dashboard Pengguna -->
+            <section id="dashboard" class="hidden">
+                <div class="dashboard-container">
+                    <h1 class="welcome-title">Selamat datang,<br>
+                        <span class="user-name" id="user-full-name"></span>
+                    </h1>
+            
+                    <div class="user-details">
+                        <div class="detail-row">
+                            <span class="detail-label">NIM:</span>
+                            <span id="user-nim" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Kelas:</span>
+                            <span id="user-kelas" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Sertifikat Disetujui:</span>
+                            <span id="sertif-disetujui" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Sisa Sertifikat:</span>
+                            <span id="sisa-sertif" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row status-row">
+                            <span class="detail-label">Status:</span>
+                            <span id="status" class="detail-value status-badge"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Deadline:</span>
+                            <span id="deadline" class="detail-value"></span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <strong>Kelas:</strong>
-                        <span id="user-kelas"></span>
-                    </div>
-                    <div class="info-row">
-                        <strong>Sertifikat Disetujui:</strong>
-                        <span id="sertif-disetujui"></span>
-                    </div>
-                    <div class="info-row">
-                        <strong>Sisa Sertifikat:</strong>
-                        <span id="sisa-sertif"></span>
-                    </div>
-                    <div class="info-row">
-                        <strong>Status:</strong>
-                        <span id="status"></span>
-                    </div>
-                    <div class="info-row">
-                        <strong>Deadline:</strong>
-                        <span id="deadline"></span>
-                    </div>
-                </section>
-
-                <footer class="dashboard-actions">
-                    <div class="helpdesk-contact">
-                        <p>Hubungi Helpdesk:</p>
+            
+                    <div class="dashboard-actions">
+                        <button id="collect-cert-btn" class="btn-primary">
+                            Kumpulkan Sertifikat
+                        </button>
+                        <div class="secondary-actions">
+                            <button id="view-feedback-btn" class="btn-secondary">
+                                Lihat Feedback
+                            </button>
+                            <button id="view-approved-certificates-btn" class="btn-secondary">
+                                Sertifikat Disetujui
+                            </button>
+                        </div>
                         <a 
                             href="https://wa.me/6285869678984" 
                             target="_blank" 
-                            rel="noopener noreferrer" 
-                            id="helpdesk-link" 
-                            class="btn-secondary"
+                            rel="noopener noreferrer"
+                            class="btn-helpdesk"
                         >
-                            WhatsApp
+                            Hubungi Helpdesk
                         </a>
                     </div>
+                </div>
+            </section>
+
+            <!-- Formulir Pengumpulan Sertifikat -->
+            <section id="cert-submission-form" class="hidden">
+                <div class="card">
+                    <header>
+                        <h1>Formulir Pengajuan Sertifikat</h1>
+                    </header>
                     
-                    <button id="collect-cert-btn" class="btn-primary">
-                        Kumpulkan Sertifikat
-                    </button>
-                </footer>
-            </div>
-        </section>
-
-        <!-- Formulir Pengumpulan Sertifikat -->
-        <section id="cert-submission-form" class="hidden">
-            <div class="card">
-                <header>
-                    <h1>Formulir Pengajuan Sertifikat</h1>
-                </header>
-                
-                <form id="cert-form" autocomplete="off">
-                    <!-- Informasi Pengguna -->
-                    <div class="user-info-display">
-                        <div class="info-row">
-                            <strong>NIM:</strong>
-                            <span id="form-nim-display"></span>
-                            <input type="hidden" id="form-nim" name="nim">
+                    <form id="cert-form" autocomplete="off">
+                        <!-- Informasi Pengguna -->
+                        <div class="user-info-display">
+                            <div class="info-row">
+                                <strong>NIM:</strong>
+                                <span id="form-nim-display"></span>
+                                <input type="hidden" id="form-nim" name="nim">
+                            </div>
+                            <div class="info-row">
+                                <strong>Nama:</strong>
+                                <span id="form-nama-display"></span>
+                                <input type="hidden" id="form-nama" name="nama">
+                            </div>
+                            <div class="info-row">
+                                <strong>Kelas:</strong>
+                                <span id="form-kelas-display"></span>
+                                <input type="hidden" id="form-kelas" name="kelas">
+                            </div>
                         </div>
-                        <div class="info-row">
-                            <strong>Nama:</strong>
-                            <span id="form-nama-display"></span>
-                            <input type="hidden" id="form-nama" name="nama">
+
+                        <!-- Bidang Formulir -->
+                        <div class="form-group">
+                            <label for="category">Kategori Lomba:</label>
+                            <select 
+                                id="category" 
+                                name="kategori_lomba"
+                                required
+                            >
+                                <option value="">Pilih Kategori</option>
+                                <option value="akademik">Akademik</option>
+                                <option value="non-akademik">Non-Akademik</option>
+                            </select>
                         </div>
-                        <div class="info-row">
-                            <strong>Kelas:</strong>
-                            <span id="form-kelas-display"></span>
-                            <input type="hidden" id="form-kelas" name="kelas">
+
+                        <div class="form-group">
+                            <label for="description">Deskripsi Lomba:</label>
+                            <textarea 
+                                id="description" 
+                                name="deskripsi_lomba" 
+                                rows="4"
+                                placeholder="Jelaskan detail lomba yang diikuti..."
+                                required
+                            ></textarea>
                         </div>
-                    </div>
 
-                    <!-- Bidang Formulir -->
-                    <div class="form-group">
-                        <label for="category">Kategori Lomba:</label>
-                        <select 
-                            id="category" 
-                            name="kategori_lomba"
-                            required
-                        >
-                            <option value="">Pilih Kategori</option>
-                            <option value="akademik">Akademik</option>
-                            <option value="non-akademik">Non-Akademik</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="certificate-link">Link Sertifikat:</label>
+                            <input 
+                                type="url" 
+                                id="certificate-link" 
+                                name="link_sertifikat" 
+                                placeholder="Masukkan link sertifikat dari Google Drive" 
+                                pattern="https://.*"
+                                required
+                            >
+                        </div>
 
-                    <div class="form-group">
-                        <label for="description">Deskripsi Lomba:</label>
-                        <textarea 
-                            id="description" 
-                            name="deskripsi_lomba" 
-                            rows="4"
-                            placeholder="Jelaskan detail lomba yang diikuti..."
-                            required
-                        ></textarea>
-                    </div>
+                        <button type="submit" class="btn-primary">Kirim Sertifikat</button>
+                    </form>
 
-                    <div class="form-group">
-                        <label for="certificate-link">Link Sertifikat:</label>
-                        <input 
-                            type="url" 
-                            id="certificate-link" 
-                            name="link_sertifikat" 
-                            placeholder="Masukkan link sertifikat dari Google Drive" 
-                            pattern="https://.*"
-                            required
-                        >
-                    </div>
+                    <p id="submission-error" class="error"></p>
+                    
+                    <footer>
+                        <button id="back-btn" class="btn-secondary">
+                            Kembali ke Dashboard
+                        </button>
+                    </footer>
+                </div>
+            </section>
+        </main>
 
-                    <button type="submit" class="btn-primary">Kirim Sertifikat</button>
-                </form>
-
-                <p id="submission-error" class="error"></p>
-                
-                <footer>
-                    <button id="back-btn" class="btn-secondary">
-                        Kembali ke Dashboard
-                    </button>
-                </footer>
-            </div>
-        </section>
-    </main>
-
-    <!-- Komponen Tetap -->
-    <aside>
-        <!-- Ikon WhatsApp -->
-        <a 
-            href="https://wa.me/6285869678984" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            id="whatsapp-icon" 
-            class="hidden"
-            aria-label="Hubungi via WhatsApp"
-        >
-            <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
-                alt="WhatsApp" 
-                width="40"
-                height="40"
+        <!-- Komponen Tetap -->
+        <aside>
+            <!-- Ikon WhatsApp -->
+            <a 
+                href="https://wa.me/6285869678984" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                id="whatsapp-icon" 
+                class="hidden"
+                aria-label="Hubungi via WhatsApp"
             >
-        </a>
-    </aside>
+                <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                    alt="WhatsApp" 
+                    width="40"
+                    height="40"
+                >
+            </a>
+        </aside>
 
-    <!-- Overlay Loading -->
-    <div 
-        class="loading-overlay" 
-        id="loading-overlay" 
-        aria-hidden="true"
-    >
+        <!-- Overlay Loading -->
         <div 
-            class="loading-spinner" 
-            role="status"
-        >
-            <span class="sr-only">Memuat...</span>
-        </div>
-        <div class="loading-text">
-            Sedang mengirim sertifikat...
-        </div>
-    </div>
-
-    <!-- Notifikasi -->
-    <div 
-        id="notification" 
-        class="notification" 
-        role="alert" 
-        aria-live="polite"
-    >
-        <span 
-            class="notification-icon" 
+            class="loading-overlay" 
+            id="loading-overlay" 
             aria-hidden="true"
         >
-            ✓
-        </span>
-        <span class="notification-message"></span>
-        <button 
-            type="button" 
-            class="notification-close" 
-            aria-label="Tutup notifikasi"
-        >
-            &times;
-        </button>
-    </div>
-
-    <!-- Maintenance Overlay -->
-    <div id="maintenance-overlay" class="maintenance-overlay hidden">
-        <div class="maintenance-content">
-            <div class="maintenance-icon">🛠️</div>
-            <h2 class="maintenance-title">Sistem Sedang Dalam Perbaikan</h2>
-            <p class="maintenance-message">
-                Mohon maaf, sistem sertifikat sedang dalam pemeliharaan untuk meningkatkan kualitas layanan.
-                <br>Silakan coba kembali beberapa saat lagi.
-            </p>
-            <p class="maintenance-contact">
-                Untuk informasi lebih lanjut, silakan hubungi helpdesk melalui WhatsApp
-            </p>
-            <button class="maintenance-logout" onclick="handleMaintenanceLogout()">Kembali ke Login</button>
+            <div 
+                class="loading-spinner" 
+                role="status"
+            >
+                <span class="sr-only">Memuat...</span>
+            </div>
+            <div class="loading-text">
+                Sedang mengirim sertifikat...
+            </div>
         </div>
-    </div>
 
-    <!-- Skrip -->
-    <script src="script.js"></script>
-</body>
-</html>
+        <!-- Notifikasi -->
+        <div 
+            id="notification" 
+            class="notification" 
+            role="alert" 
+            aria-live="polite"
+        >
+            <span 
+                class="notification-icon" 
+                aria-hidden="true"
+            >
+                ✓
+            </span>
+            <span class="notification-message"></span>
+            <button 
+                type="button" 
+                class="notification-close" 
+                aria-label="Tutup notifikasi"
+            >
+                &times;
+            </button>
+        </div>
+
+        <!-- Skrip -->
+        <script src="script.js"></script>
+    </body>
+    </html>
