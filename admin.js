@@ -1,43 +1,45 @@
 document.addEventListener("DOMContentLoaded", () => {
     // DOM Elements
-    const adminLoginPage = document.getElementById("admin-login-page");
-    const adminDashboard = document.getElementById("admin-dashboard");
-    const approvedDashboard = document.getElementById("approved-dashboard");
-    const adminLoginForm = document.getElementById("admin-login-form");
-    const adminErrorMessage = document.getElementById("admin-error-message");
-    const submissionsList = document.getElementById("submissions-list");
-    const totalSubmissions = document.getElementById("total-submissions");
-    const pendingSubmissions = document.getElementById("pending-submissions");
-    const refreshBtn = document.getElementById("refresh-btn");
-    const viewApprovedBtn = document.getElementById("view-approved-btn");
-    const viewPendingBtn = document.getElementById("view-pending-btn");
-    const refreshApprovedBtn = document.getElementById("refresh-approved-btn");
-    const rankingsBody = document.getElementById("rankings-body");
-    const approvedList = document.getElementById("approved-list");
-    const totalApproved = document.getElementById("total-approved");
-    const activeStudents = document.getElementById("active-students");
-    const loadingOverlay = document.getElementById("loading-overlay");
-    const notification = document.getElementById("notification");
-    const notificationMessage = notification.querySelector(".notification-message");
-    const notificationClose = notification.querySelector(".notification-close");
+    const elements = {
+        loginPage: document.getElementById("admin-login-page"),
+        dashboard: document.getElementById("admin-dashboard"),
+        approvedDashboard: document.getElementById("approved-dashboard"),
+        loginForm: document.getElementById("admin-login-form"),
+        errorMessage: document.getElementById("admin-error-message"),
+        submissionsList: document.getElementById("submissions-list"),
+        totalSubmissions: document.getElementById("total-submissions"),
+        pendingSubmissions: document.getElementById("pending-submissions"),
+        refreshBtn: document.getElementById("refresh-btn"),
+        viewApprovedBtn: document.getElementById("view-approved-btn"),
+        viewPendingBtn: document.getElementById("view-pending-btn"),
+        refreshApprovedBtn: document.getElementById("refresh-approved-btn"),
+        rankingsBody: document.getElementById("rankings-body"),
+        approvedList: document.getElementById("approved-list"),
+        totalApproved: document.getElementById("total-approved"),
+        activeStudents: document.getElementById("active-students"),
+        loadingOverlay: document.getElementById("loading-overlay"),
+        notification: document.getElementById("notification"),
+        logoutBtns: {
+            adminDashboard: document.getElementById("admin-logout-btn"),
+            approvedDashboard: document.getElementById("admin-approved-logout-btn")
+        }
+    };
 
-    // Show notification function
+    // Notification Elements
+    const notificationMessage = elements.notification.querySelector(".notification-message");
+    const notificationClose = elements.notification.querySelector(".notification-close");
+
+    // Utility Functions
     function showNotification(message, type = 'success') {
         notificationMessage.textContent = message;
-        notification.className = `notification ${type}`;
-        notification.classList.add('show');
+        elements.notification.className = `notification ${type}`;
+        elements.notification.classList.add('show');
         
         setTimeout(() => {
-            notification.classList.remove('show');
+            elements.notification.classList.remove('show');
         }, 3000);
     }
 
-    // Hide notification on close button click
-    notificationClose.addEventListener('click', () => {
-        notification.classList.remove('show');
-    });
-
-    // Format date function
     function formatDate(dateString) {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -48,31 +50,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Load Submissions
+    // API Endpoints
+    const API_URL = "https://script.google.com/macros/s/AKfycbzxy5d1xc_aJQALgNrI4YkNOOvdPxv1wjuPIkzMBmfry0_ZPs9YlkmDraZyfOKekrTECQ/exec";
+    const SHEETS = {
+        SUBMISSIONS: 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?sheet=Sheet2&tqx=out:json',
+        STUDENT_DATA: 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?sheet=Sheet1&tqx=out:json'
+    };
+
+    // Submission Handling
     async function loadSubmissions() {
-        const submissionsUrl = 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?sheet=Sheet2&tqx=out:json';
-        
         try {
-            loadingOverlay.classList.add("show");
-            const response = await fetch(submissionsUrl);
+            elements.loadingOverlay.classList.add("show");
+            const response = await fetch(SHEETS.SUBMISSIONS);
             const text = await response.text();
             const jsonStart = text.indexOf('({') + 1;
             const jsonEnd = text.lastIndexOf('})') + 1;
             const data = JSON.parse(text.substring(jsonStart, jsonEnd));
             
-            submissionsList.innerHTML = '';
+            elements.submissionsList.innerHTML = '';
             let pendingCount = 0;
             
-            // Skip header row
             const rows = data.table.rows;
             if (rows.length <= 1) {
-                submissionsList.innerHTML = '<p class="no-data">Belum ada pengajuan sertifikat</p>';
-                totalSubmissions.textContent = "0";
-                pendingSubmissions.textContent = "0";
+                elements.submissionsList.innerHTML = '<p class="no-data">Belum ada pengajuan sertifikat</p>';
+                elements.totalSubmissions.textContent = "0";
+                elements.pendingSubmissions.textContent = "0";
                 return;
             }
 
-            // Process each submission
+            // Process submissions
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
                 if (!row.c[0] || !row.c[1] || !row.c[2]) continue;
@@ -105,38 +111,38 @@ document.addEventListener("DOMContentLoaded", () => {
                         <button class="btn-approve" onclick="approveSubmission('${submission.nim}')">
                             Setujui
                         </button>
+                        <button class="btn-reject" onclick="rejectSubmission('${submission.nim}')">
+                            Tolak
+                        </button>
                         <a href="${submission.link}" target="_blank" class="btn-view">
                             Lihat Sertifikat
                         </a>
                     </div>
                 `;
                 
-                submissionsList.appendChild(card);
+                elements.submissionsList.appendChild(card);
             }
             
-            totalSubmissions.textContent = pendingCount;
-            pendingSubmissions.textContent = pendingCount;
+            elements.totalSubmissions.textContent = pendingCount;
+            elements.pendingSubmissions.textContent = pendingCount;
             
         } catch (error) {
             console.error("Error loading submissions:", error);
             showNotification("Gagal memuat data pengajuan.", "error");
-            submissionsList.innerHTML = '<p class="error-message">Terjadi kesalahan saat memuat data</p>';
+            elements.submissionsList.innerHTML = '<p class="error-message">Terjadi kesalahan saat memuat data</p>';
         } finally {
-            loadingOverlay.classList.remove("show");
+            elements.loadingOverlay.classList.remove("show");
         }
     }
 
-    // Load Approved Data
+    // Approved Data Handling
     async function loadApprovedData() {
         try {
-            loadingOverlay.classList.add("show");
-            
-            const sheet1Url = 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?sheet=Sheet1&tqx=out:json';
-            const sheet2Url = 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?sheet=Sheet2&tqx=out:json';
+            elements.loadingOverlay.classList.add("show");
             
             const [sheet1Response, sheet2Response] = await Promise.all([
-                fetch(sheet1Url),
-                fetch(sheet2Url)
+                fetch(SHEETS.STUDENT_DATA),
+                fetch(SHEETS.SUBMISSIONS)
             ]);
 
             const sheet1Text = await sheet1Response.text();
@@ -164,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .sort((a, b) => b.certCount - a.certCount);
 
             // Update rankings display
-            rankingsBody.innerHTML = '';
+            elements.rankingsBody.innerHTML = '';
             rankings.forEach((student, index) => {
                 const progress = (student.certCount / 10) * 100;
                 const row = document.createElement('tr');
@@ -183,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </td>
                 `;
                 
-                rankingsBody.appendChild(row);
+                elements.rankingsBody.appendChild(row);
             });
 
             // Process approved certificates
@@ -203,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
             // Update approved certificates display
-            approvedList.innerHTML = '';
+            elements.approvedList.innerHTML = '';
             approvedCerts.forEach(cert => {
                 const card = document.createElement('div');
                 card.className = 'certificate-card';
@@ -222,108 +228,141 @@ document.addEventListener("DOMContentLoaded", () => {
                     </a>
                 `;
                 
-                approvedList.appendChild(card);
+                elements.approvedList.appendChild(card);
             });
 
             // Update statistics
             const totalCerts = rankings.reduce((sum, student) => sum + student.certCount, 0);
-            totalApproved.textContent = totalCerts;
-            activeStudents.textContent = rankings.length;
+            elements.totalApproved.textContent = totalCerts;
+            elements.activeStudents.textContent = rankings.length;
 
         } catch (error) {
             console.error("Error loading approved data:", error);
             showNotification("Gagal memuat data.", "error");
         } finally {
-            loadingOverlay.classList.remove("show");
+            elements.loadingOverlay.classList.remove("show");
         }
     }
 
-    // Approve Submission
+    // Submission Actions
     window.approveSubmission = async function(nim) {
         try {
-            loadingOverlay.classList.add("show");
+            elements.loadingOverlay.classList.add("show");
             
-            const url = "https://script.google.com/macros/s/AKfycbwoW_g_U4dwuLjXOYyWaXmVtOhf3oy0sCU0owHQwQ9QtDW6G8uCSF2LeQVWxpSTfpPuLA/exec";
-            const data = {
+            const queryString = new URLSearchParams({
                 action: 'approve',
                 nim: nim
-            };
+            }).toString();
             
-            const queryString = new URLSearchParams(data).toString();
-            
-            await fetch(`${url}?${queryString}`, {
+            await fetch(`${API_URL}?${queryString}`, {
                 method: 'POST',
                 mode: 'no-cors'
             });
             
             showNotification("Sertifikat berhasil disetujui!", "success");
             
-            // Switch to approved dashboard and refresh data
-            adminDashboard.classList.add("hidden");
-            approvedDashboard.classList.remove("hidden");
-            await loadApprovedData();
+            // Refresh submissions
+            await loadSubmissions();
             
         } catch (error) {
             console.error("Error approving submission:", error);
             showNotification("Gagal menyetujui sertifikat.", "error");
         } finally {
-            loadingOverlay.classList.remove("show");
+            elements.loadingOverlay.classList.remove("show");
+        }
+    };
+
+    window.rejectSubmission = async function(nim) {
+        const feedback = prompt("Berikan alasan penolakan sertifikat:");
+        if (feedback === null) return; // User cancelled
+
+        try {
+            elements.loadingOverlay.classList.add("show");
+            
+            const queryString = new URLSearchParams({
+                action: 'reject',
+                nim: nim,
+                feedback: feedback
+            }).toString();
+            
+            await fetch(`${API_URL}?${queryString}`, {
+                method: 'POST',
+                mode: 'no-cors'
+            });
+            
+            showNotification("Sertifikat ditolak!", "error");
+            
+            // Refresh submissions
+            await loadSubmissions();
+            
+        } catch (error) {
+            console.error("Error rejecting submission:", error);
+            showNotification("Gagal menolak sertifikat.", "error");
+        } finally {
+            elements.loadingOverlay.classList.remove("show");
         }
     };
 
     // Event Listeners
-    adminLoginForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("admin-password").value;
+    function setupEventListeners() {
+        // Login
+        elements.loginForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("admin-password").value;
 
-        if (username === "panitia" && password === "panitia") {
-            adminLoginPage.classList.add("hidden");
-            adminDashboard.classList.remove("hidden");
+            if (username === "panitia" && password === "panitia") {
+                elements.loginPage.classList.add("hidden");
+                elements.dashboard.classList.remove("hidden");
+                loadSubmissions();
+                showNotification("Login berhasil! 👋", "success");
+            } else {
+                elements.errorMessage.textContent = "Username atau Password salah!";
+                showNotification("Login gagal!", "error");
+            }
+        });
+
+        // Navigation
+        elements.viewApprovedBtn.addEventListener("click", () => {
+            elements.dashboard.classList.add("hidden");
+            elements.approvedDashboard.classList.remove("hidden");
+            loadApprovedData();
+        });
+
+        elements.viewPendingBtn.addEventListener("click", () => {
+            elements.approvedDashboard.classList.add("hidden");
+            elements.dashboard.classList.remove("hidden");
             loadSubmissions();
-            showNotification("Login berhasil! 👋", "success");
-        } else {
-            adminErrorMessage.textContent = "Username atau Password salah!";
-            showNotification("Login gagal!", "error");
-        }
-    });
+        });
 
-    viewApprovedBtn.addEventListener("click", () => {
-        adminDashboard.classList.add("hidden");
-        approvedDashboard.classList.remove("hidden");
-        loadApprovedData();
-    });
+        // Refresh
+        elements.refreshBtn.addEventListener("click", () => {
+            loadSubmissions();
+            showNotification("Data berhasil diperbarui!", "success");
+        });
 
-    viewPendingBtn.addEventListener("click", () => {
-        approvedDashboard.classList.add("hidden");
-        adminDashboard.classList.remove("hidden");
-        loadSubmissions();
-    });
+        elements.refreshApprovedBtn.addEventListener("click", () => {
+            loadApprovedData();
+            showNotification("Data berhasil diperbarui!", "success");
+        });
 
-    refreshBtn.addEventListener("click", () => {
-        loadSubmissions();
-        showNotification("Data berhasil diperbarui!", "success");
-    });
+        // Logout
+        Object.values(elements.logoutBtns).forEach(btn => {
+            btn.addEventListener("click", () => {
+                elements.dashboard.classList.add("hidden");
+                elements.approvedDashboard.classList.add("hidden");
+                elements.loginPage.classList.remove("hidden");
+                elements.loginForm.reset();
+                showNotification("Logout berhasil!", "success");
+            });
+        });
 
-    refreshApprovedBtn.addEventListener("click", () => {
-        loadApprovedData();
-        showNotification("Data berhasil diperbarui!", "success");
-    });
+        // Notification Close
+        notificationClose.addEventListener('click', () => {
+            elements.notification.classList.remove('show');
+        });
+    }
 
-    // Logout Buttons
-    document.getElementById("admin-logout-btn").addEventListener("click", () => {
-        adminDashboard.classList.add("hidden");
-        approvedDashboard.classList.add("hidden");
-        adminLoginPage.classList.remove("hidden");
-        adminLoginForm.reset();
-        showNotification("Logout berhasil!", "success");
-    });
-
-    document.getElementById("admin-approved-logout-btn").addEventListener("click", () => {
-        adminDashboard.classList.add("hidden");
-        approvedDashboard.classList.add("hidden");
-        adminLoginPage.classList.remove("hidden");
-        adminLoginForm.reset();
-        showNotification("Logout berhasil!", "success");
-    });
+    // Initialize
+    setupEventListeners();
 });
