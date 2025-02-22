@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Update rankings display
             elements.rankingsBody.innerHTML = '';
             rankings.forEach((student, index) => {
-                const progress = (student.certCount / 10) * 100;
+                const progress = (student.certCount / 2) * 100;
                 const row = document.createElement('tr');
                 row.className = index < 3 ? `top-3 rank-${index + 1}` : '';
                 
