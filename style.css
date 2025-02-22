@@ -1382,3 +1382,9 @@ textarea:focus {
       margin-bottom: 10px;
   }
 }
+.form-hint {
+  display: block;
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
