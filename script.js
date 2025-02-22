@@ -192,7 +192,7 @@ function updateDashboard(user) {
     document.getElementById('user-kelas').textContent = user.kelas;
     document.getElementById('sertif-disetujui').textContent = user.sertif_disetujui;
     
-    const remaining = 10 - user.sertif_disetujui;
+    const remaining = 2 - user.sertif_disetujui;
     document.getElementById('sisa-sertif').textContent = remaining;
 
     const statusElement = document.getElementById('status');
@@ -275,7 +275,7 @@ function updateDashboard(user) {
 // Deadline Calculation Function
 function calculateDeadlineDays() {
     const today = new Date();
-    const deadline = new Date(2025, 5, 14); // June 14, 2025
+    const deadline = new Date(2025, 6, 14); // June 14, 2025
     
     today.setHours(0, 0, 0, 0);
     deadline.setHours(0, 0, 0, 0);
@@ -669,67 +669,122 @@ async function fetchAndDisplayApprovedCertificates(nim) {
     });
   
     // Certificate Submission Handler
-    const certForm = document.getElementById("cert-form");
-    certForm?.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        elements.submissionError.textContent = "";
-  
-        const category = document.getElementById("category").value;
-        const description = document.getElementById("description").value;
-        const certificateLink = document.getElementById("certificate-link").value;
-  
-        if (!category || !description || !certificateLink) {
-            elements.submissionError.textContent = "Mohon isi semua field dengan benar!";
-            showNotification("Mohon lengkapi semua field!", "error");
+    // Certificate Submission Handler with Enhanced Protection
+const certForm = document.getElementById("cert-form");
+certForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    elements.submissionError.textContent = "";
+
+    const category = document.getElementById("category").value;
+    const description = document.getElementById("description").value;
+    const certificateLink = document.getElementById("certificate-link").value;
+
+    // Check if all fields are filled
+    if (!category || !description || !certificateLink) {
+        elements.submissionError.textContent = "Mohon isi semua field dengan benar!";
+        showNotification("Mohon lengkapi semua field!", "error");
+        return;
+    }
+
+    // Check if link is from Google Drive
+    const googleDriveRegex = /https:\/\/(drive\.google\.com|docs\.google\.com)/i;
+    if (!googleDriveRegex.test(certificateLink)) {
+        elements.submissionError.textContent = "Link sertifikat harus dari Google Drive!";
+        showNotification("Gunakan link Google Drive untuk sertifikat", "error");
+        return;
+    }
+
+    // Check if certificate already exists in approved or feedback
+    try {
+        // Check in approved certificates
+        const approvedResponse = await fetch(approvedCertificatesSheetUrl);
+        const approvedText = await approvedResponse.text();
+        const approvedData = parseGoogleSheetsJSON(approvedText);
+        
+        // Check in feedback (for rejected certificates)
+        const feedbackResponse = await fetch(feedbackSheetUrl);
+        const feedbackText = await feedbackResponse.text();
+        const feedbackData = parseGoogleSheetsJSON(feedbackText);
+        
+        // Check for duplicate link in approved certificates
+        const isDuplicateInApproved = approvedData.table.rows.some(row => 
+            row.c[5] && // Link column
+            row.c[5].v === certificateLink && 
+            row.c[2] && // NIM column
+            row.c[2].v.toString() === currentUser.nim.toString()
+        );
+        
+        // Check for duplicate link in feedback
+        const isDuplicateInFeedback = feedbackData.table.rows.some(row => 
+            row.c[8] && // Link column
+            row.c[8].v === certificateLink && 
+            row.c[0] && // NIM column
+            row.c[0].v.toString() === currentUser.nim.toString()
+        );
+        
+        if (isDuplicateInApproved) {
+            elements.submissionError.textContent = "Sertifikat ini sudah pernah disetujui!";
+            showNotification("Sertifikat sudah disetujui sebelumnya", "error");
             return;
         }
-  
-        const data = {
-            kelas: currentUser.kelas,
-            nama: currentUser.nama,
-            nim: currentUser.nim,
-            kategori_lomba: category,
-            deskripsi_lomba: description,
-            link_sertifikat: certificateLink
-        };
-  
-        const url = "https://script.google.com/macros/s/AKfycbwoW_g_U4dwuLjXOYyWaXmVtOhf3oy0sCU0owHQwQ9QtDW6G8uCSF2LeQVWxpSTfpPuLA/exec";
-  
-        try {
-            elements.loadingOverlay.classList.add("show");
-            certForm.classList.add("submitting");
-  
-            const queryString = new URLSearchParams(data).toString();
-            const submissionUrl = `${url}?${queryString}`;
-            
-            await fetch(submissionUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-  
-            showNotification("Sertifikat berhasil disubmit! ✨", "success");
-            certForm.reset();
-            
-            // Update form with user data after reset
-            document.getElementById("form-nim").value = currentUser.nim;
-            document.getElementById("form-nama").value = currentUser.nama;
-            document.getElementById("form-kelas").value = currentUser.kelas;
-            
-            elements.certSubmissionForm.classList.add("hidden");
-            elements.dashboard.classList.remove("hidden");
-            
-        } catch (error) {
-            console.error("Error submitting data:", error);
-            showNotification("Gagal mengirim sertifikat. Coba lagi.", "error");
-            elements.submissionError.textContent = "Terjadi kesalahan. Silakan coba lagi.";
-        } finally {
-            elements.loadingOverlay.classList.remove("show");
-            certForm.classList.remove("submitting");
+        
+        if (isDuplicateInFeedback) {
+            elements.submissionError.textContent = "Sertifikat ini sudah pernah diberikan feedback!";
+            showNotification("Sertifikat sudah pernah diajukan", "error");
+            return;
         }
-    });
+        
+    } catch (error) {
+        console.error("Error checking for duplicate certificates:", error);
+        // Continue with submission if check fails - fail open is better than blocking valid submissions
+    }
+
+    const data = {
+        kelas: currentUser.kelas,
+        nama: currentUser.nama,
+        nim: currentUser.nim,
+        kategori_lomba: category,
+        deskripsi_lomba: description,
+        link_sertifikat: certificateLink
+    };
+
+    const url = "https://script.google.com/macros/s/AKfycbwoW_g_U4dwuLjXOYyWaXmVtOhf3oy0sCU0owHQwQ9QtDW6G8uCSF2LeQVWxpSTfpPuLA/exec";
+
+    try {
+        elements.loadingOverlay.classList.add("show");
+        certForm.classList.add("submitting");
+
+        const queryString = new URLSearchParams(data).toString();
+        const submissionUrl = `${url}?${queryString}`;
+        
+        await fetch(submissionUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        showNotification("Sertifikat berhasil disubmit! ✨", "success");
+        certForm.reset();
+        
+        // Update form with user data after reset
+        document.getElementById("form-nim").value = currentUser.nim;
+        document.getElementById("form-nama").value = currentUser.nama;
+        document.getElementById("form-kelas").value = currentUser.kelas;
+        
+        elements.certSubmissionForm.classList.add("hidden");
+        elements.dashboard.classList.remove("hidden");
+        
+    } catch (error) {
+        console.error("Error submitting data:", error);
+        showNotification("Gagal mengirim sertifikat. Coba lagi.", "error");
+        elements.submissionError.textContent = "Terjadi kesalahan. Silakan coba lagi.";
+    } finally {
+        elements.loadingOverlay.classList.remove("show");
+        certForm.classList.remove("submitting");
+    }
+});
   
     // Maintenance Overlay Handling
     const maintenanceOverlay = document.getElementById('maintenance-overlay');
