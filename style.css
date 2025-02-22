@@ -1257,3 +1257,128 @@ textarea:focus {
 .btn-helpdesk:hover {
   background-color: #128c7e;
 }
+/* Feedback Section Styling */
+.feedback-container {
+  margin: 20px 0;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.feedback-description {
+  color: #666;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.feedback-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feedback-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.feedback-title {
+  flex: 1;
+  min-width: 200px;
+}
+
+.feedback-title h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.feedback-category {
+  display: inline-block;
+  background-color: #e0e0e0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.feedback-date {
+  font-size: 0.85rem;
+  color: #666;
+  margin-left: 10px;
+}
+
+.feedback-body {
+  margin-bottom: 15px;
+}
+
+.feedback-status {
+  margin-bottom: 10px;
+}
+
+.feedback-description {
+  margin-bottom: 15px;
+}
+
+.feedback-description p {
+  margin: 5px 0;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.feedback-details {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 15px;
+}
+
+.feedback-detail-row {
+  margin-bottom: 5px;
+}
+
+.feedback-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+/* Button styles */
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .feedback-header {
+      flex-direction: column;
+  }
+  
+  .feedback-date {
+      margin-left: 0;
+      margin-top: 5px;
+  }
+  
+  .feedback-title {
+      margin-bottom: 10px;
+  }
+}
