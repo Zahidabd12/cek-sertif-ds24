@@ -309,7 +309,7 @@ document.head.appendChild(styleElement);
     // Feedback and Approved Certificates URLs
     // Updated URLs for Feedback and Approved Certificates
 const feedbackSheetUrl = 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?tqx=out:json&sheet=Feedback';
-const approvedCertificatesSheetUrl = 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?tqx=out:json&sheet=Approved';
+const approvedCertificatesSheetUrl = 'https://docs.google.com/spreadsheets/d/1tLDIMHIlhXMvcVrdlI9HYKBtOrT9mLfo9lL10J9jNTk/gviz/tq?tqx=out:json&sheet=Sheet3';
 
 // Improved JSON Parsing Function
 function parseGoogleSheetsJSON(text) {
@@ -327,6 +327,7 @@ function parseGoogleSheetsJSON(text) {
 
 // Fetch and Display Feedback Function
 // Fetch and Display Feedback Function
+// Update the fetchAndDisplayFeedback function to include all feedback data
 async function fetchAndDisplayFeedback(nim) {
     try {
         const response = await fetch(feedbackSheetUrl);
@@ -341,7 +342,13 @@ async function fetchAndDisplayFeedback(nim) {
                 nim: row.c[0] ? row.c[0].v : null,
                 feedback: row.c[1] ? row.c[1].v : 'Tidak ada feedback',
                 timestamp: row.c[2] ? new Date(row.c[2].v).toLocaleDateString('id-ID') : 'Tanggal tidak tersedia',
-                status: row.c[3] ? row.c[3].v : 'Tidak diketahui'
+                status: row.c[3] ? row.c[3].v : 'Tidak diketahui',
+                kelas: row.c[4] ? row.c[4].v : 'Tidak tersedia',
+                nama: row.c[5] ? row.c[5].v : 'Tidak tersedia',
+                kategori_lomba: row.c[6] ? row.c[6].v : 'Tidak tersedia',
+                deskripsi_lomba: row.c[7] ? row.c[7].v : 'Tidak tersedia',
+                link_sertifikat: row.c[8] ? row.c[8].v : '#',
+                tanggal_submit: row.c[9] ? new Date(row.c[9].v).toLocaleDateString('id-ID') : 'Tanggal tidak tersedia'
             }));
         
         // Clear previous feedback
@@ -354,7 +361,7 @@ async function fetchAndDisplayFeedback(nim) {
         
         elements.noFeedbackMessage.style.display = 'none';
         
-        // Create feedback items
+        // Create feedback items with expanded information
         userFeedback.forEach(feedback => {
             const feedbackItem = document.createElement('div');
             feedbackItem.classList.add('feedback-item');
@@ -367,8 +374,13 @@ async function fetchAndDisplayFeedback(nim) {
             
             feedbackItem.innerHTML = `
                 <div class="feedback-header">
-                    <strong>NIM:</strong> ${feedback.nim}
-                    <span class="feedback-date">${feedback.timestamp}</span>
+                    <div class="feedback-title">
+                        <h3>${feedback.deskripsi_lomba}</h3>
+                        <span class="feedback-category">${feedback.kategori_lomba}</span>
+                    </div>
+                    <span class="feedback-date">
+                        <strong>Tanggal Feedback:</strong> ${feedback.timestamp}
+                    </span>
                 </div>
                 <div class="feedback-body">
                     <div class="feedback-status">
@@ -376,13 +388,121 @@ async function fetchAndDisplayFeedback(nim) {
                         <span style="color: ${statusColor};">${feedback.status}</span>
                     </div>
                     <div class="feedback-description">
-                        <strong>Keterangan:</strong> 
+                        <strong>Keterangan Feedback:</strong> 
                         <p>${feedback.feedback}</p>
                     </div>
+                    <div class="feedback-details">
+                        <div class="feedback-detail-row">
+                            <strong>NIM:</strong> ${feedback.nim}
+                        </div>
+                        <div class="feedback-detail-row">
+                            <strong>Kelas:</strong> ${feedback.kelas}
+                        </div>
+                        <div class="feedback-detail-row">
+                            <strong>Tanggal Submit:</strong> ${feedback.tanggal_submit}
+                        </div>
+                    </div>
+                </div>
+                <div class="feedback-footer">
+                    <a href="${feedback.link_sertifikat}" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="btn-secondary btn-sm">
+                        Lihat Sertifikat
+                    </a>
                 </div>
             `;
             elements.feedbackList.appendChild(feedbackItem);
         });
+
+        // Add CSS for feedback items if not already added
+        if (!document.getElementById('feedback-styles')) {
+            const feedbackStyles = document.createElement('style');
+            feedbackStyles.id = 'feedback-styles';
+            feedbackStyles.textContent = `
+                .feedback-item {
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    background-color: #f9f9f9;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                }
+
+                .feedback-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 12px;
+                    flex-wrap: wrap;
+                }
+
+                .feedback-title {
+                    flex: 1;
+                    min-width: 200px;
+                }
+
+                .feedback-title h3 {
+                    margin: 0 0 5px 0;
+                    font-size: 1.2rem;
+                    color: #333;
+                }
+
+                .feedback-category {
+                    display: inline-block;
+                    background-color: #e0e0e0;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                    color: #555;
+                }
+
+                .feedback-date {
+                    font-size: 0.85rem;
+                    color: #666;
+                    margin-left: 10px;
+                }
+
+                .feedback-body {
+                    margin-bottom: 15px;
+                }
+
+                .feedback-status {
+                    margin-bottom: 10px;
+                }
+
+                .feedback-description {
+                    margin-bottom: 15px;
+                }
+
+                .feedback-description p {
+                    margin: 5px 0;
+                    white-space: pre-line;
+                }
+
+                .feedback-details {
+                    background-color: #f0f0f0;
+                    padding: 10px;
+                    border-radius: 4px;
+                    font-size: 0.9rem;
+                }
+
+                .feedback-detail-row {
+                    margin-bottom: 5px;
+                }
+
+                .feedback-footer {
+                    display: flex;
+                    justify-content: flex-end;
+                }
+
+                .btn-sm {
+                    padding: 5px 10px;
+                    font-size: 0.85rem;
+                }
+            `;
+            document.head.appendChild(feedbackStyles);
+        }
     } catch (error) {
         console.error("Error fetching feedback:", error);
         elements.noFeedbackMessage.textContent = 'Gagal memuat feedback';
@@ -399,9 +519,20 @@ async function fetchAndDisplayApprovedCertificates(nim) {
         
         const jsonData = parseGoogleSheetsJSON(text);
         
-        // Filter approved certificates for current user
+        console.log('Raw Approved Certificates Data:', jsonData); // Debug log
+
+        // Pastikan nim dikonversi ke string untuk pencocokan yang akurat
+        const nimString = nim.toString();
+        
+        // Filter approved certificates untuk pengguna saat ini
         const userApprovedCertificates = jsonData.table.rows
-            .filter(row => row.c[2] && row.c[2].v.toString() === nim.toString())
+            .filter(row => {
+                // Debug: Log setiap baris untuk pemeriksaan
+                console.log('Checking row:', row);
+                
+                // Pastikan kolom nim ada dan cocokkan
+                return row.c[2] && row.c[2].v.toString() === nimString;
+            })
             .map(row => ({
                 kelas: row.c[0] ? row.c[0].v : 'Tidak diketahui',
                 nama: row.c[1] ? row.c[1].v : 'Tidak diketahui',
@@ -411,12 +542,15 @@ async function fetchAndDisplayApprovedCertificates(nim) {
                 linkSertifikat: row.c[5] ? row.c[5].v : '#',
                 tanggal: row.c[6] ? new Date(row.c[6].v).toLocaleDateString('id-ID') : 'Tanggal tidak tersedia'
             }));
+
+        console.log('Filtered Approved Certificates:', userApprovedCertificates); // Debug log
         
         // Kosongkan daftar sertifikat sebelumnya
         elements.approvedCertificatesList.innerHTML = '';
         
         if (userApprovedCertificates.length === 0) {
             elements.noApprovedCertificatesMessage.style.display = 'block';
+            console.log('Tidak ada sertifikat disetujui untuk NIM:', nim);
             return;
         }
         
@@ -501,17 +635,17 @@ async function fetchAndDisplayApprovedCertificates(nim) {
         event.preventDefault();
         const nimInput = document.getElementById("nim");
         const passwordInput = document.getElementById("password");
-  
+    
         if (!nimInput || !passwordInput) {
             showNotification("Terjadi kesalahan pada form login", "error");
             return;
         }
-  
+    
         const nim = nimInput.value;
         const password = passwordInput.value;
-  
+    
         const user = userData.find((u) => u.nim === parseFloat(nim));
-  
+    
         if (user && password === `${nim}${user.kelas}`) {
             currentUser = user;
             elements.loginPage.classList.add("hidden");
@@ -519,6 +653,9 @@ async function fetchAndDisplayApprovedCertificates(nim) {
             elements.whatsappIcon.classList.remove("hidden");
             updateDashboard(user);
             showNotification("Login berhasil! 👋", "success");
+            
+            // Show the deadline and PIN Baraya reminder popup
+            showDeadlineAndPinReminder(calculateDeadlineDays());
         } else {
             showNotification("NIM atau password salah", "error");
         }
@@ -620,6 +757,210 @@ async function fetchAndDisplayApprovedCertificates(nim) {
         // Reset current user
         currentUser = null;
     }
+    function showDeadlineAndPinReminder(daysRemaining) {
+        // Create popup container if it doesn't exist
+        let reminderPopup = document.getElementById('reminder-popup');
+        
+        if (!reminderPopup) {
+            reminderPopup = document.createElement('div');
+            reminderPopup.id = 'reminder-popup';
+            reminderPopup.className = 'reminder-popup';
+            document.body.appendChild(reminderPopup);
+            
+            // Create the popup content
+            const popupHTML = `
+                <div class="reminder-content">
+                    <div class="reminder-header">
+                        <h3>Pengumuman Penting</h3>
+                        <button type="button" class="reminder-close" aria-label="Tutup pengumuman">&times;</button>
+                    </div>
+                    <div class="reminder-body">
+                        <div class="reminder-item deadline-reminder">
+                            <div class="reminder-icon">⏱️</div>
+                            <div class="reminder-text">
+                                <strong id="deadline-text">Deadline pengumpulan sertifikat: ${daysRemaining} hari lagi</strong>
+                                <p>Pastikan Anda mengumpulkan semua sertifikat sebelum batas waktu</p>
+                            </div>
+                        </div>
+                        <div class="reminder-item pin-reminder">
+                            <div class="reminder-icon">🔐</div>
+                            <div class="reminder-text">
+                                <strong>Gunakan PIN Baraya</strong>
+                                <p>Selalu gunakan PIN Baraya saat ada kegiatan di kampus</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reminder-footer">
+                        <button type="button" class="btn-secondary reminder-dismiss">Saya Mengerti</button>
+                    </div>
+                </div>
+            `;
+            
+            reminderPopup.innerHTML = popupHTML;
+            
+            // Add event listeners for close buttons
+            const closeBtn = reminderPopup.querySelector('.reminder-close');
+            const dismissBtn = reminderPopup.querySelector('.reminder-dismiss');
+            
+            closeBtn.addEventListener('click', () => {
+                reminderPopup.classList.remove('show');
+            });
+            
+            dismissBtn.addEventListener('click', () => {
+                reminderPopup.classList.remove('show');
+            });
+            
+            // Add style for the popup if not already in CSS
+            if (!document.getElementById('reminder-popup-styles')) {
+                const popupStyles = document.createElement('style');
+                popupStyles.id = 'reminder-popup-styles';
+                popupStyles.textContent = `
+                    .reminder-popup {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 1000;
+                        opacity: 0;
+                        visibility: hidden;
+                        transition: opacity 0.3s, visibility 0.3s;
+                    }
+                    
+                    .reminder-popup.show {
+                        opacity: 1;
+                        visibility: visible;
+                    }
+                    
+                    .reminder-content {
+                        background-color: white;
+                        border-radius: 8px;
+                        max-width: 500px;
+                        width: 90%;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                        overflow: hidden;
+                    }
+                    
+                    .reminder-header {
+                        background-color: #f8f9fa;
+                        padding: 15px 20px;
+                        border-bottom: 1px solid #e9ecef;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    
+                    .reminder-header h3 {
+                        margin: 0;
+                        font-size: 1.25rem;
+                        color: #212529;
+                    }
+                    
+                    .reminder-close {
+                        background: none;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        color: #6c757d;
+                    }
+                    
+                    .reminder-body {
+                        padding: 20px;
+                    }
+                    
+                    .reminder-item {
+                        display: flex;
+                        margin-bottom: 15px;
+                        padding-bottom: 15px;
+                        border-bottom: 1px solid #e9ecef;
+                    }
+                    
+                    .reminder-item:last-child {
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                        border-bottom: none;
+                    }
+                    
+                    .reminder-icon {
+                        font-size: 2rem;
+                        margin-right: 15px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    
+                    .reminder-text {
+                        flex: 1;
+                    }
+                    
+                    .reminder-text strong {
+                        display: block;
+                        margin-bottom: 5px;
+                        font-size: 1.1rem;
+                    }
+                    
+                    .reminder-text p {
+                        margin: 0;
+                        color: #6c757d;
+                    }
+                    
+                    .deadline-reminder .reminder-icon {
+                        color: #dc3545;
+                    }
+                    
+                    .pin-reminder .reminder-icon {
+                        color: #198754;
+                    }
+                    
+                    .reminder-footer {
+                        padding: 15px 20px;
+                        background-color: #f8f9fa;
+                        text-align: right;
+                        border-top: 1px solid #e9ecef;
+                    }
+                    
+                    .reminder-dismiss {
+                        cursor: pointer;
+                    }
+                    
+                    @media (max-width: 576px) {
+                        .reminder-content {
+                            width: 95%;
+                        }
+                        
+                        .reminder-text strong {
+                            font-size: 1rem;
+                        }
+                        
+                        .reminder-text p {
+                            font-size: 0.9rem;
+                        }
+                    }
+                `;
+                document.head.appendChild(popupStyles);
+            }
+        } else {
+            // Update deadline text if popup already exists
+            const deadlineText = reminderPopup.querySelector('#deadline-text');
+            if (deadlineText) {
+                if (daysRemaining > 0) {
+                    deadlineText.textContent = `Deadline pengumpulan sertifikat: ${daysRemaining} hari lagi`;
+                } else if (daysRemaining === 0) {
+                    deadlineText.textContent = `Deadline pengumpulan sertifikat: HARI INI!`;
+                } else {
+                    deadlineText.textContent = `Deadline pengumpulan sertifikat telah terlewati!`;
+                }
+            }
+        }
+        
+        // Only show if not already shown in this session
+            setTimeout(() => {
+                reminderPopup.classList.add('show');
+            }, 500);
+        }
   
     // Initial setup
     debugLog('Script initialization complete');
